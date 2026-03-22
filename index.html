@@ -6279,8 +6279,8 @@
             }
             return profiles.sort((a, b) => new Date(b.lastSeen) - new Date(a.lastSeen));
         }
-        const TODAY = new Date(2026, 2, 20);
-        const YEAR = 2026;
+        const TODAY = new Date();
+        const YEAR = TODAY.getFullYear();
         const MONTHS = ['JANUARY', 'FEBRUARY', 'MARCH', 'APRIL', 'MAY', 'JUNE', 'JULY', 'AUGUST', 'SEPTEMBER', 'OCTOBER', 'NOVEMBER', 'DECEMBER'];
         const DOWS = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
         const DAYS_SHORT = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
@@ -6464,7 +6464,10 @@
         function getAttrColor(v) { if (v >= 80) return '#00ff88'; if (v >= 60) return '#ffd700'; if (v >= 40) return '#ffd700'; if (v >= 25) return '#ff6b35'; return '#e8002d'; }
         function getLevelName(v) { if (v >= 90) return 'MAX'; if (v >= 75) return 'ELITE'; if (v >= 60) return 'PRO'; if (v >= 45) return 'ADV'; if (v >= 30) return 'MID'; return 'ROOKIE'; }
         function getRank(lvl) { let r = RANKS[0]; for (const x of RANKS) { if (lvl >= x.lvl) r = x; } return r; }
-        function todayKey() { return `${YEAR}-03-20`; /* fixed today */ }
+        function todayKey() {
+            const d = new Date();
+            return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+        }
         function dateKey(y, m, d) { return `${y}-${String(m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`; }
         function daysInMonth(y, m) { return new Date(y, m + 1, 0).getDate(); }
         function dayOfYear(d) { const s = new Date(d.getFullYear(), 0, 0); return Math.floor((d - s) / 86400000); }
@@ -9346,12 +9349,17 @@
         // ══ DATE
         function renderDate() {
             const d = new Date();
-            setText('todayDate', d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }).toUpperCase());
+            setText('todayDate', d.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }).toUpperCase());
         }
 
         // ══ INIT
         function init() {
             sanitizeState(); // ensure all data is valid before any render
+
+            // Global Date Sync specified by user
+            S.currentDate = new Date().toLocaleDateString('en-GB');
+            save(); // Ensure new global date is persisted
+
             prevLvl = heroLevel();
             // Profile screen
             initProfileScreen();
